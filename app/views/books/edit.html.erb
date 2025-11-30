@@ -1,0 +1,108 @@
+<div class="card">
+  <h1>Edytuj Książkę</h1>
+  
+  <% if @book.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@book.errors.count, "błąd") %> uniemożliwiły zapisanie książki:</h2>
+      <ul>
+        <% @book.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <form action="<%= book_path(@book) %>" method="post" style="max-width: 600px;">
+    <input type="hidden" name="_method" value="PATCH">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+    
+    <div class="form-group">
+      <label for="title">Tytuł *</label>
+      <input type="text" id="title" name="book[title]" value="<%= @book.title %>" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="author">Autor *</label>
+      <input type="text" id="author" name="book[author]" value="<%= @book.author %>" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="genre">Gatunek</label>
+      <select id="genre" name="book[genre]" style="width: 100%;">
+        <option value="">-- Wybierz --</option>
+        <% @genres.each do |genre| %>
+          <option value="<%= genre %>" <%= "selected" if @book.genre == genre %>><%= genre %></option>
+        <% end %>
+        <option value="inny">-- Inny --</option>
+      </select>
+      <div id="custom_genre_wrapper" style="display: <%= @book.genre && !@genres.include?(@book.genre) && @book.genre != 'inny' ? 'block' : 'none' %>; margin-top: 0.5rem;">
+        <input type="text" id="custom_genre" placeholder="Wpisz nowy gatunek" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px;" value="<%= @book.genre unless @genres.include?(@book.genre) %>" onchange="document.getElementById('genre').value = this.value;">
+      </div>
+    </div>
+    
+    <script>
+      document.getElementById('genre').addEventListener('change', function() {
+        const wrapper = document.getElementById('custom_genre_wrapper');
+        if(this.value === 'inny') {
+          wrapper.style.display = 'block';
+          document.getElementById('custom_genre').focus();
+        } else {
+          wrapper.style.display = 'none';
+          document.getElementById('custom_genre').value = '';
+        }
+      });
+    </script>
+    
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select id="status" name="book[status]">
+        <option value="unread" <%= "selected" if @book.unread? %>>Nieprzeczytane</option>
+        <option value="read" <%= "selected" if @book.read? %>>Przeczytane</option>
+      </select>
+    </div>
+
+    <div id="read_fields" style="display: <%= @book.read? ? 'block' : 'none' %>;">
+      <div class="form-group">
+        <label for="read_date">Data przeczytania</label>
+        <input type="date" id="read_date" name="book[read_date]" value="<%= @book.read_date %>">
+      </div>
+
+      <div class="form-group">
+        <label for="rating">Ocena (0-5 gwiazd)</label>
+        <select id="rating" name="book[rating]">
+          <option value="0" <%= "selected" if @book.rating.to_i == 0 %>>Brak oceny</option>
+          <option value="1" <%= "selected" if @book.rating.to_i == 1 %>>⭐ (1/5)</option>
+          <option value="2" <%= "selected" if @book.rating.to_i == 2 %>>⭐⭐ (2/5)</option>
+          <option value="3" <%= "selected" if @book.rating.to_i == 3 %>>⭐⭐⭐ (3/5)</option>
+          <option value="4" <%= "selected" if @book.rating.to_i == 4 %>>⭐⭐⭐⭐ (4/5)</option>
+          <option value="5" <%= "selected" if @book.rating.to_i == 5 %>>⭐⭐⭐⭐⭐ (5/5)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="review">Moja recenzja</label>
+        <textarea id="review" name="book[review]" placeholder="Napisz swoją opinię..." rows="4"><%= @book.review %></textarea>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('status').addEventListener('change', function() {
+        const readFields = document.getElementById('read_fields');
+        readFields.style.display = this.value === 'read' ? 'block' : 'none';
+      });
+    </script>
+
+    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+      <input type="checkbox" id="favorite" name="book[favorite]" value="1" <%= "checked" if @book.favorite %> style="width: auto;">
+      <label for="favorite" style="margin: 0;">❤️ To jest moja ulubiona książka</label>
+    </div>
+    
+    <div class="form-group">
+      <label for="tags">Tagi (oddzielone przecinkami)</label>
+      <input type="text" id="tags" name="book[tags]" placeholder="np. fikcja, klasyka, ulubione" value="<%= @book.tags.pluck(:name).join(', ') %>">
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Aktualizuj Książkę</button>
+    <a href="<%= book_path(@book) %>" class="btn btn-secondary">Anuluj</a>
+  </form>
+</div>

@@ -1,0 +1,60 @@
+<div class="hero">
+  <h1>📚 Witaj w Bookworm Manager</h1>
+  <p>Organizuj i zarządzaj swoją osobistą biblioteką z łatwością</p>
+  <div style="margin-top: 2rem;">
+    <% if user_signed_in? %>
+      <a href="<%= dashboard_path %>" class="btn btn-primary" style="margin-right: 1rem;">Przejdź do Strony Głównej</a>
+    <% else %>
+      <a href="<%= new_user_path %>" class="btn btn-primary" style="margin-right: 1rem;">Rejestracja</a>
+      <a href="<%= new_session_path %>" class="btn btn-secondary">Logowanie</a>
+    <% end %>
+  </div>
+</div>
+
+<style>
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+</style>
+
+
+<div class="card" style="max-width: 800px; margin: 3rem auto; text-align: center;">
+  <h2 class="gradient-text" style="margin-bottom: 2rem;">Funkcje Aplikacji</h2>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+    
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Zarządzanie Książkami</h3>
+      <p style="color: #666;">Dodawaj, edytuj i organizuj swoją kolekcję książek</p>
+    </div>
+    
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Oceny i Recenzje</h3>
+      <p style="color: #666;">Oceniaj książki i pisz recenzje</p>
+    </div>
+
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Forum Społeczności</h3>
+      <p style="color: #666;">Dyskutuj z innymi użytkownikami</p>
+    </div>
+
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Statystyki</h3>
+      <p style="color: #666;">Śledź swoje postępy czytania</p>
+    </div>
+
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Ulubione</h3>
+      <p style="color: #666;">Oznaczaj swoje ulubione książki</p>
+    </div>
+
+    <div>
+      <h3 class="gradient-text" style="margin-bottom: 0.5rem;">Profile Użytkowników</h3>
+      <p style="color: #666;">Odkrywaj profile innych czytelników</p>
+    </div>
+
+  </div>
+</div>

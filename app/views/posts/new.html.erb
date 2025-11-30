@@ -1,0 +1,40 @@
+<div class="card">
+  <% if @book %>
+    <h1>Nowa opinia o "<%= @book.title %>"</h1>
+    <p style="color: #666; margin-bottom: 1.5rem;">Autor: <%= @book.author %></p>
+  <% else %>
+    <h1>Nowy wpis na forum</h1>
+    <p style="color: #666; margin-bottom: 1.5rem;">Podziel się swoją opinią lub myślą</p>
+  <% end %>
+
+  <% if @post.errors.any? %>
+    <div id="error_explanation" style="background: #fadbd8; border: 1px solid #e74c3c; padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">
+      <h4 style="color: #c0392b;"><%= pluralize(@post.errors.count, "błąd") %></h4>
+      <ul style="margin: 0; padding-left: 1.5rem;">
+        <% @post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @book %>
+    <form action="<%= book_posts_path(@book) %>" method="post" style="max-width: 600px;">
+  <% else %>
+    <form action="<%= posts_path %>" method="post" style="max-width: 600px;">
+  <% end %>
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+    <div class="form-group">
+      <label for="content">Twoja wiadomość *</label>
+      <textarea id="content" name="post[content]" rows="8" placeholder="<%= @book ? "Napisz co myślisz o tej książce..." : "Podziel się swoją opinią lub pytaniem..." %>" required style="width: 100%;"><%= @post.content %></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Opublikuj post</button>
+    <% if @book %>
+      <a href="<%= book_path(@book) %>" class="btn btn-secondary">Anuluj</a>
+    <% else %>
+      <a href="<%= posts_path %>" class="btn btn-secondary">Anuluj</a>
+    <% end %>
+  </form>
+</div>

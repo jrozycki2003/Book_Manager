@@ -1,0 +1,50 @@
+<div class="card">
+  <h1>Edytuj profil</h1>
+  
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "błąd") %> uniemożliwiły zapisanie profilu:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  
+  <form action="<%= user_path(@user) %>" method="post" style="max-width: 500px;">
+    <input type="hidden" name="_method" value="PATCH">
+    <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+    
+    <div class="form-group">
+      <label for="name">Imię i nazwisko</label>
+      <input type="text" id="name" name="user[name]" value="<%= @user.name %>" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="user[email]" value="<%= @user.email %>" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="bio">Opis</label>
+      <textarea id="bio" name="user[bio]" placeholder="Napisz coś o sobie..." rows="4" style="width: 100%;"><%= @user.bio %></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Ulubione gatunki</label>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; margin-bottom: 1rem;">
+        <% @all_genres.each do |genre| %>
+          <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <input type="checkbox" name="user[favorite_genres][]" value="<%= genre %>" 
+              <% if @user.favorite_genres.present? && @user.favorite_genres.split(',').map(&:strip).include?(genre) %>checked<% end %>>
+            <%= genre %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+    <a href="<%= user_path(@user) %>" class="btn btn-secondary">Anuluj</a>
+  </form>
+</div>

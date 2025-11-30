@@ -1,0 +1,80 @@
+<div class="card">
+  <div style="display: flex; gap: 1rem; margin: 1rem 0; padding-bottom: 1rem; border-bottom: 1px solid #ecf0f1;">
+    <div>
+      <img src="<%= @post.user.profile_image %>" alt="<%= @post.user.name %>" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+    </div>
+    <div style="flex: 1;">
+      <p style="margin: 0; font-weight: bold;">
+        <%= link_to @post.user.name, user_path(@post.user), style: "color: #3498db; text-decoration: none;" %>
+      </p>
+      <p style="margin: 0; color: #999; font-size: 0.9rem;">
+        <%= @post.created_at.strftime("%d.%m.%Y %H:%M") %>
+      </p>
+      <% if @post.book %>
+        <p style="margin: 0.5rem 0 0 0; color: #666; font-size: 0.9rem;">
+          O książce: <strong><%= link_to @post.book.title, book_path(@post.book), style: "color: #3498db;" %></strong>
+        </p>
+      <% end %>
+    </div>
+    <div style="text-align: right;">
+      <% like = @post.likes.find_by(user_id: current_user&.id) %>
+      <% if like %>
+        <%= button_to "❤️ Już polubiłem", post_like_path(@post, like), method: :delete, style: "background: none; border: none; cursor: pointer; font-size: 1.5rem;" %>
+      <% elsif current_user %>
+        <%= button_to "🤍 Polub", post_likes_path(@post), method: :post, style: "background: none; border: none; cursor: pointer; font-size: 1.5rem;" %>
+      <% end %>
+      <p style="margin: 0.5rem 0 0 0; color: #999; font-size: 0.9rem;">
+        <strong><%= @post.likes.count %></strong>
+      </p>
+      <% if current_user && (current_user.admin? || current_user.id == @post.user_id) %>
+        <%= button_to "🗑️", post_path(@post), method: :delete, style: "background: none; border: none; cursor: pointer; font-size: 1.5rem; color: #e74c3c; margin-top: 0.5rem;", data: { confirm: "Czy na pewno?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div style="margin: 2rem 0; padding: 1.5rem; background: #f9f9f9; border-left: 4px solid #3498db; border-radius: 4px;">
+    <%= simple_format(@post.content) %>
+  </div>
+
+  <h3 style="margin-top: 2rem;">Komentarze (<%= @comments.count %>)</h3>
+
+  <% if current_user %>
+    <form action="<%= post_comments_path(@post) %>" method="post" style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 4px;">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <textarea name="comment[content]" placeholder="Wpisz komentarz..." rows="3" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-family: inherit;"></textarea>
+      <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Skomentuj</button>
+    </form>
+  <% end %>
+
+  <% if @comments.any? %>
+    <% @comments.each do |comment| %>
+      <div style="padding: 1rem; border-left: 2px solid #ecf0f1; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: start;">
+          <div style="flex: 1;">
+            <p style="margin: 0; font-weight: bold;">
+              <%= link_to comment.user.name, user_path(comment.user), style: "color: #3498db; text-decoration: none;" %>
+            </p>
+            <p style="margin: 0; color: #999; font-size: 0.85rem;">
+              <%= comment.created_at.strftime("%d.%m.%Y %H:%M") %>
+            </p>
+          </div>
+          <% if current_user && (current_user.id == comment.user_id || current_user.admin?) %>
+            <%= button_to "Usuń", post_comment_path(@post, comment), method: :delete, style: "background: none; border: none; color: #e74c3c; cursor: pointer; text-decoration: underline;", data: { confirm: "Czy na pewno?" } %>
+          <% end %>
+        </div>
+        <p style="margin: 0.5rem 0 0 0; color: #333; line-height: 1.5;">
+          <%= simple_format(comment.content) %>
+        </p>
+      </div>
+    <% end %>
+  <% else %>
+    <p style="color: #999; text-align: center; padding: 1rem;">Brak komentarzy. Bądź pierwszy(a)!</p>
+  <% end %>
+
+  <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ecf0f1;">
+    <%= link_to "← Powrót do społeczności", posts_path, class: "btn btn-secondary" %>
+    <% if @post.book %>
+      <%= link_to "← Powrót do książki", book_path(@post.book), class: "btn btn-secondary" %>
+    <% end %>
+  </div>
+</div>

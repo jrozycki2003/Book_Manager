@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Bookworm Manager" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Bookworm Manager">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Manifest PWA - odkomentuj aby włączyć instalowalne aplikacje (pamiętaj o włączeniu w routes.rb) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Dołączanie arkuszy stylów %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      
+      :root {
+        --primary: #3498db;
+        --primary-dark: #2980b9;
+        --secondary: #e74c3c;
+        --success: #27ae60;
+        --danger: #e74c3c;
+        --light: #ecf0f1;
+        --dark: #2c3e50;
+        --gray: #95a5a6;
+        --border: #ddd;
+      }
+      
+      body { 
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+        background: linear-gradient(135deg, #e8eef7 0%, #a8bfd9 100%);
+        color: #333;
+        line-height: 1.6;
+        min-height: 100vh;
+      }
+      
+      header { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; 
+        padding: 1rem 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      
+      header nav { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        max-width: 1200px; 
+        margin: 0 auto;
+      }
+      
+      header nav a { 
+        color: white; 
+        text-decoration: none; 
+        margin: 0 1rem;
+        font-weight: 500;
+        transition: opacity 0.3s;
+      }
+      
+      header nav a:hover { 
+        opacity: 0.8;
+      }
+      
+      header nav a:first-child {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-left: 0;
+      }
+      
+      .nav-right { 
+        display: flex; 
+        gap: 1rem;
+        align-items: center;
+      }
+      
+      main { 
+        max-width: 1200px; 
+        margin: 2rem auto; 
+        padding: 0 2rem;
+      }
+      
+      .alert { 
+        padding: 1rem 1.5rem; 
+        margin: 1rem 0; 
+        border-radius: 8px;
+        border-left: 4px solid;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      
+      .alert.notice { 
+        background: #d4edda; 
+        color: #155724; 
+        border-left-color: #28a745;
+      }
+      
+      .alert.alert-danger { 
+        background: #f8d7da; 
+        color: #721c24; 
+        border-left-color: #dc3545;
+      }
+      
+      .card { 
+        background: white; 
+        padding: 2rem; 
+        border-radius: 12px; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        transition: box-shadow 0.3s ease;
+      }
+      
+      .card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      }
+      
+      .form-group { 
+        margin-bottom: 1.5rem; 
+      }
+      
+      label { 
+        display: block; 
+        margin-bottom: 0.5rem; 
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      
+      input, textarea, select { 
+        width: 100%; 
+        padding: 0.875rem; 
+        border: 2px solid #ecf0f1;
+        border-radius: 8px; 
+        font-size: 1rem;
+        font-family: inherit;
+        transition: border-color 0.3s;
+      }
+      
+      input:focus, textarea:focus, select:focus { 
+        outline: none; 
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+      }
+      
+      .btn { 
+        display: inline-block; 
+        padding: 0.75rem 1.5rem; 
+        border: none; 
+        border-radius: 8px; 
+        cursor: pointer; 
+        text-decoration: none; 
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+      }
+      
+      .btn-primary { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; 
+      }
+      
+      .btn-primary:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+      
+      .btn-success { 
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white; 
+      }
+      
+      .btn-success:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+      }
+      
+      .btn-danger { 
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white; 
+      }
+      
+      .btn-danger:hover { 
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+      }
+      
+      .btn-secondary { 
+        background: #95a5a6; 
+        color: white; 
+      }
+      
+      .btn-secondary:hover { 
+        background: #7f8c8d;
+        transform: translateY(-2px);
+      }
+      
+      .dashboard-stats { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+        gap: 2rem; 
+        margin-bottom: 2rem;
+      }
+      
+      .stat-card { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white; 
+        padding: 2rem; 
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .stat-card.read { 
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      }
+      
+      .stat-card.unread { 
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      }
+      
+      .stat-number { 
+        font-size: 2.5rem; 
+        font-weight: bold; 
+        margin: 0.5rem 0;
+      }
+      
+      .stat-label { 
+        font-size: 0.9rem; 
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      table { 
+        width: 100%; 
+        border-collapse: collapse;
+      }
+      
+      th, td { 
+        padding: 1rem; 
+        text-align: left; 
+        border-bottom: 1px solid #ecf0f1;
+      }
+      
+      th { 
+        background: #f8f9fa; 
+        font-weight: 600;
+        color: #2c3e50;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+      }
+      
+      tr:hover { 
+        background: #f8f9fa;
+      }
+      
+      .pagination { 
+        display: flex; 
+        gap: 0.5rem; 
+        margin: 2rem 0; 
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .pagination a, .pagination span { 
+        padding: 0.5rem 0.75rem; 
+        border: 1px solid #ddd; 
+        border-radius: 6px; 
+        text-decoration: none;
+        transition: all 0.3s;
+      }
+      
+      .pagination a:hover { 
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      
+      .pagination .current { 
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      
+      .actions { 
+        display: flex; 
+        gap: 0.5rem;
+      }
+      
+      .hero { 
+        text-align: center; 
+        padding: 4rem 2rem;
+      }
+      
+      .hero h1 { 
+        font-size: 2.5rem; 
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      
+      .hero p { 
+        font-size: 1.2rem; 
+        color: #666; 
+        margin-bottom: 2rem;
+      }
+      
+      .search-form { 
+        display: flex; 
+        gap: 1rem; 
+        margin-bottom: 2rem; 
+        flex-wrap: wrap;
+      }
+      
+      .search-form input, .search-form select { 
+        flex: 1; 
+        min-width: 200px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <div>
+          <a href="<%= root_path %>">Bookworm Manager</a>
+        </div>
+        <div class="nav-right">
+          <% if user_signed_in? %>
+            <% if current_user.admin? %>
+              <a href="<%= admin_users_path %>">Panel Administracyjny</a>
+            <% end %>
+            <a href="<%= dashboard_path %>">Strona Główna</a>
+            <a href="<%= books_path %>">Moje Książki</a>
+            <a href="<%= posts_path %>">Społeczność</a>
+            <a href="<%= user_path(current_user) %>">Profil</a>
+            <form action="/sessions" method="post" style="display: inline;">
+              <input type="hidden" name="_method" value="DELETE">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <button type="submit" style="background: none; border: none; color: white; cursor: pointer; text-decoration: none; font-family: inherit; font-size: inherit;">Wyloguj</button>
+            </form>
+          <% else %>
+            <a href="<%= new_user_path %>">Rejestracja</a>
+            <a href="<%= new_session_path %>">Logowanie</a>
+          <% end %>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <% if notice %>
+        <div class="alert alert-success notice"><%= notice %></div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-danger"><%= alert %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
+  </body>
+</html>

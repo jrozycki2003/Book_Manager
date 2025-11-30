@@ -1,0 +1,49 @@
+<div class="card">
+  <h1>Panel Książek</h1>
+  <p>Zarządzaj wszystkimi książkami w systemie</p>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Tytuł</th>
+        <th>Autor</th>
+        <th>Właściciel</th>
+        <th>Gatunek</th>
+        <th>Status</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @books.each do |book| %>
+        <tr>
+          <td><strong><%= book.title %></strong></td>
+          <td><%= book.author %></td>
+          <td><%= book.user.name %></td>
+          <td><%= book.genre || "N/A" %></td>
+          <td>
+            <span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: <%= book.read? ? '#27ae60' : '#e74c3c' %>; color: white;">
+              <%= book.status_pl %>
+            </span>
+          </td>
+          <td>
+            <form action="<%= admin_book_path(book) %>" method="post" style="display: inline;">
+              <input type="hidden" name="_method" value="DELETE">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <button type="submit" class="btn btn-danger" style="padding: 0.5rem;" onclick="return confirm('Czy jesteś pewny?')">Usuń</button>
+            </form>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <%= paginate @books %>
+  </div>
+</div>
+
+<div class="card">
+  <a href="<%= admin_users_path %>" class="btn btn-secondary">Zarządzaj Użytkownikami</a>
+</div>

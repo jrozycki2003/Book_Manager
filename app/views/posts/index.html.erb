@@ -1,0 +1,62 @@
+<div class="card">
+  <h1>Społeczność</h1>
+  <% if current_user %>
+    <%= link_to "Nowy wpis", new_post_path, class: "btn btn-primary", style: "margin-top: 1rem;" %>
+  <% end %>
+</div>
+
+<% if @posts.any? %>
+  <% @posts.each do |post| %>
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: start;">
+        <div style="flex: 1;">
+          <p style="margin: 0.5rem 0; color: #333; line-height: 1.6;">
+            <%= link_to post.content.truncate(150), post_path(post), style: "color: #2c3e50; text-decoration: none;" %>
+          </p>
+          
+          <% if post.book %>
+            <p style="margin: 0.5rem 0; color: #666;">
+              <strong>Książka:</strong> 
+              <%= link_to post.book.title, book_path(post.book), style: "color: #3498db;" %>
+              <span style="color: #999;">- <%= post.book.author %></span>
+            </p>
+          <% end %>
+
+          <p style="margin: 0.5rem 0; color: #999; font-size: 0.9rem;">
+            Opublikował(a): 
+            <%= link_to post.user.name, user_path(post.user), style: "color: #3498db;" %>
+            <span style="margin-left: 1rem;"><%= post.created_at.strftime("%d.%m.%Y %H:%M") %></span>
+          </p>
+        </div>
+        
+        <div style="text-align: right;">
+          <span style="display: inline-block; background: #ecf0f1; padding: 0.5rem 1rem; border-radius: 20px; margin-left: 1rem;">
+            <strong><%= post.likes.count %></strong> ❤️
+          </span>
+          <% if current_user&.admin? || current_user&.id == post.user_id %>
+            <%= button_to "🗑️", post_path(post), method: :delete, style: "background: none; border: none; cursor: pointer; font-size: 1.5rem; margin-left: 0.5rem;", data: { confirm: "Czy na pewno?" } %>
+          <% end %>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid #ecf0f1; padding-top: 1rem; display: flex; gap: 1rem;">
+        <% if current_user %>
+          <% like = post.likes.find_by(user_id: current_user.id) %>
+          <% if like %>
+            <%= button_to "❤️ Już polubiłem", post_like_path(post, like), method: :delete, class: "btn btn-secondary", style: "padding: 0.5rem 1rem;" %>
+          <% else %>
+            <%= button_to "❤️ Polub", post_likes_path(post), method: :post, class: "btn btn-secondary", style: "padding: 0.5rem 1rem;" %>
+          <% end %>
+        <% end %>
+
+        <%= link_to "💬 #{post.comments.count} Komentarzy", post_path(post), class: "btn btn-secondary", style: "padding: 0.5rem 1rem;" %>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="card">
+    <p style="text-align: center; color: #999;">
+      Brak postów. <% if current_user %><%= link_to "Opublikuj nowy wpis", new_post_path %><% else %>Zaloguj się aby opublikować!<% end %>
+    </p>
+  </div>
+<% end %>

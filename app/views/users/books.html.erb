@@ -1,0 +1,33 @@
+<div class="card">
+  <h1><%= @user.name %> - Wszystkie Książki</h1>
+  <p><%= link_to "← Powrót do profilu", user_path(@user) %></p>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Tytuł</th>
+        <th>Autor</th>
+        <th>Gatunek</th>
+        <th>Status</th>
+        <th>Ocena</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @books.each do |book| %>
+        <tr style="cursor: pointer;" onclick="window.location.href = '<%= book_path(book) %>';">
+          <td><%= book.title %></td>
+          <td><%= book.author %></td>
+          <td><%= book.genre || "N/A" %></td>
+          <td><span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: <%= book.read? ? '#27ae60' : '#e74c3c' %>; color: white;"><%= book.status_pl %></span></td>
+          <td><%= book.rating > 0 ? book.rating_stars : "brak" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="pagination" style="margin-top: 2rem;">
+    <%= paginate @books %>
+  </div>
+</div>

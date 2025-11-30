@@ -1,0 +1,105 @@
+<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+  <h1 style="margin-bottom: 0.5rem; color: white;">Witaj ponownie, <%= @user.name %>!</h1>
+  <p style="color: rgba(255,255,255,0.9); margin: 0;">Oto przegląd Twojej biblioteki</p>
+</div>
+
+<div class="dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-label">Łączna liczba książek w bibliotece</div>
+    <div class="stat-number"><%= @total_books %></div>
+  </div>
+  <div class="stat-card read">
+    <div class="stat-label">Przeczytane książki</div>
+    <div class="stat-number"><%= @read_books %></div>
+  </div>
+  <div class="stat-card unread">
+    <div class="stat-label">Nieprzeczytane książki</div>
+    <div class="stat-number"><%= @unread_books %></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="margin-bottom: 1.5rem;">Szybkie Akcje</h2>
+  <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    <a href="<%= new_book_path %>" class="btn btn-primary">Dodaj nową książkę</a>
+    <a href="<%= books_path %>" class="btn btn-secondary">Wszystkie książki</a>
+    <a href="<%= books_path(format: 'csv') %>" class="btn btn-secondary">Eksportuj CSV</a>
+    <a href="<%= books_path(format: 'json') %>" class="btn btn-secondary">Eksportuj JSON</a>
+  </div>
+</div>
+
+<% if @genre_counts.any? %>
+  <div class="card">
+    <h2 style="margin-bottom: 1.5rem;">Rozkład Gatunków</h2>
+    <div style="position: relative; width: 400px; height: 300px; margin: 0 auto;">
+      <canvas id="genreChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const genreChartCanvas = document.getElementById('genreChart');
+      if (!genreChartCanvas) return;
+      
+      const ctx = genreChartCanvas.getContext('2d');
+      
+      const colors = [
+        '#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+        '#1abc9c', '#e67e22', '#34495e', '#c0392b', '#16a085'
+      ];
+      
+      const labels = <%= @genre_counts.keys.to_json.html_safe %>;
+      const data = <%= @genre_counts.values.to_json.html_safe %>;
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: colors.slice(0, labels.length),
+            borderColor: '#fff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right'
+            }
+          }
+        }
+      });
+    });
+  </script>
+<% end %>
+
+<div class="card">
+  <h2 style="margin-bottom: 1.5rem;">Ostatnio dodane książki</h2>
+  <% if @recent_books.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Tytuł</th>
+          <th>Autor</th>
+          <th>Gatunek</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_books.each do |book| %>
+          <tr style="cursor: pointer;" onclick="window.location.href = '<%= book_path(book) %>';">
+            <td><%= book.title %></td>
+            <td><%= book.author %></td>
+            <td><%= book.genre || "N/A" %></td>
+            <td><span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: <%= book.read? ? '#27ae60' : '#e74c3c' %>; color: white;"><%= book.status_pl %></span></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p>Brak książek. <%= link_to "Dodaj pierwszą książkę!", new_book_path %></p>
+  <% end %>
+</div>

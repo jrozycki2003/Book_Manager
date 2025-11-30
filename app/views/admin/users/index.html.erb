@@ -1,0 +1,44 @@
+<div class="card">
+  <h1>Panel Administracyjny - Użytkownicy</h1>
+  <p>Zarządzaj wszystkimi użytkownikami w systemie</p>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Imię i Nazwisko</th>
+        <th>Email</th>
+        <th>Rola</th>
+        <th>Książki</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr style="cursor: pointer;" onclick="window.location.href = '<%= admin_user_path(user) %>';">
+          <td><strong><%= user.name %></strong></td>
+          <td><%= user.email %></td>
+          <td><span style="padding: 0.25rem 0.5rem; border-radius: 3px; background: <%= user.admin? ? '#3498db' : '#95a5a6' %>; color: white;"><%= user.role.titleize %></span></td>
+          <td><%= user.books.count %></td>
+          <td onclick="event.stopPropagation();">
+            <div class="actions">
+              <% unless user == current_user %>
+                <form action="<%= admin_user_path(user) %>" method="post" style="display: inline;">
+                  <input type="hidden" name="_method" value="DELETE">
+                  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                  <button type="submit" class="btn btn-danger" style="padding: 0.5rem;" onclick="return confirm('Czy jesteś pewny?')">Usuń</button>
+                </form>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <%= paginate @users %>
+  </div>
+</div>
+

@@ -1,0 +1,71 @@
+<div class="card">
+  <h1>Moje Książki</h1>
+  <a href="<%= new_book_path %>" class="btn btn-primary">Dodaj Nową Książkę</a>
+</div>
+
+<div class="card">
+  <form action="<%= books_path %>" method="get" class="search-form">
+    <input type="text" name="q" placeholder="Szukaj po tytule lub autorze..." value="<%= @search_query %>">
+    <select name="genre">
+      <option value="">Wszystkie Gatunki</option>
+      <% @genres.each do |genre| %>
+        <option value="<%= genre %>" <%= "selected" if @genre_filter == genre %>>
+          <%= genre %>
+        </option>
+      <% end %>
+    </select>
+    <select name="status">
+      <option value="">Wszystkie Statusy</option>
+      <option value="read" <%= "selected" if @status_filter == "read" %>>Przeczytane</option>
+      <option value="unread" <%= "selected" if @status_filter == "unread" %>>Nieprzeczytane</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Szukaj</button>
+  </form>
+</div>
+
+<div class="card">
+  <% if @books.any? %>
+    <table>
+      <thead>
+        <tr>
+          <th>Tytuł</th>
+          <th>Autor</th>
+          <th>Gatunek</th>
+          <th>Status</th>
+          <th>Tagi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @books.each do |book| %>
+          <tr style="cursor: pointer;" onclick="window.location.href = '<%= book_path(book) %>';">
+            <td><strong><%= book.title %></strong></td>
+            <td><%= book.author %></td>
+            <td><%= book.genre || "N/A" %></td>
+            <td>
+              <span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: <%= book.read? ? '#27ae60' : '#e74c3c' %>; color: white;">
+                <%= book.status_pl %>
+              </span>
+            </td>
+            <td>
+              <% if book.tags.any? %>
+                <% book.tags.each do |tag| %>
+                  <span style="display: inline-block; background: #ecf0f1; padding: 0.25rem 0.5rem; border-radius: 3px; margin: 0 0.25rem;">
+                    <%= tag.name %>
+                  </span>
+                <% end %>
+              <% else %>
+                <em style="color: #999;">Brak tagów</em>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <%= paginate @books %>
+    </div>
+  <% else %>
+    <p>Nie znaleziono książek. <%= link_to "Dodaj swoją pierwszą książkę!", new_book_path %></p>
+  <% end %>
+</div>

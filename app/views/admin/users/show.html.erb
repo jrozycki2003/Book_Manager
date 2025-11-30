@@ -1,0 +1,60 @@
+<div class="card">
+  <h1><%= @user.name %></h1>
+  <p><strong>Email:</strong> <%= @user.email %></p>
+  <p><strong>Rok założenia:</strong> <%= @user.created_at.strftime('%Y') %></p>
+</div>
+
+<div class="dashboard-stats">
+  <div class="stat-card">
+    <div class="stat-label">Łączna liczba książek</div>
+    <div class="stat-number"><%= @books_count %></div>
+  </div>
+  <div class="stat-card read">
+    <div class="stat-label">Przeczytane książki</div>
+    <div class="stat-number"><%= @read_books_count %></div>
+  </div>
+  <div class="stat-card unread">
+    <div class="stat-label">Nieprzeczytane książki</div>
+    <div class="stat-number"><%= @unread_books_count %></div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Książki Użytkownika</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Tytuł</th>
+        <th>Autor</th>
+        <th>Gatunek</th>
+        <th>Status</th>
+        <th>Akcje</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @user.books.each do |book| %>
+        <tr>
+          <td><strong><%= book.title %></strong></td>
+          <td><%= book.author %></td>
+          <td><%= book.genre || "N/A" %></td>
+          <td>
+            <span style="padding: 0.25rem 0.75rem; border-radius: 4px; background: <%= book.read? ? '#27ae60' : '#e74c3c' %>; color: white;">
+              <%= book.status_pl %>
+            </span>
+          </td>
+          <td>
+            <form action="<%= admin_book_path(book) %>" method="post" style="display: inline;">
+              <input type="hidden" name="_method" value="DELETE">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <button type="submit" class="btn btn-danger" style="padding: 0.5rem;" onclick="return confirm('Czy jesteś pewny?')">Usuń</button>
+            </form>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <a href="<%= admin_users_path %>" class="btn btn-secondary">Powrót do użytkowników</a>
+</div>

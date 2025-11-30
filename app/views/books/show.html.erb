@@ -1,0 +1,86 @@
+<div class="card" style="display: grid; grid-template-columns: 300px 1fr; gap: 2rem;">
+  <div style="text-align: center;">
+    <img src="<%= @book.cover_image %>" alt="<%= @book.title %>" style="max-width: 100%; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+    <% if @book.favorite %>
+      <div style="margin-top: 1.5rem; padding: 0.75rem; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 8px; font-size: 1.1rem; font-weight: bold;">
+        ❤️ Ulubiona
+      </div>
+    <% end %>
+  </div>
+
+  <div>
+    <div style="margin-bottom: 2rem;">
+      <h1 style="margin-bottom: 0.5rem;"><%= @book.title %></h1>
+      <p style="color: #666; font-size: 1.1rem; margin: 0;"><%= @book.author %></p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+      <div>
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">📖 Gatunek</p>
+        <p style="font-size: 1.1rem; font-weight: 600;"><%= @book.genre || "N/A" %></p>
+      </div>
+      <div>
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">📊 Status</p>
+        <span style="display: inline-block; padding: 0.5rem 1rem; border-radius: 8px; background: <%= @book.read? ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' : 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' %>; color: white; font-weight: 600;">
+          <%= @book.status_pl %>
+        </span>
+      </div>
+    </div>
+
+    <% if @book.read_date.present? %>
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">📅 Data przeczytania</p>
+        <p style="font-size: 1.1rem; font-weight: 600;"><%= @book.read_date.strftime('%d.%m.%Y') %></p>
+      </div>
+    <% end %>
+
+    <% if @book.rating > 0 %>
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Ocena</p>
+        <p style="font-size: 1.3rem; font-weight: 600;"><%= @book.rating_stars %> <span style="color: #666;">(<%=@book.rating %>/5)</span></p>
+      </div>
+    <% else %>
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.25rem;">Ocena</p>
+        <p style="color: #999;">Brak oceny</p>
+      </div>
+    <% end %>
+    
+    <% if @book.tags.any? %>
+      <div style="margin-bottom: 1.5rem;">
+        <p style="color: #666; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">🏷️ Tagi</p>
+        <div>
+          <% @book.tags.each do |tag| %>
+            <span style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; margin: 0.25rem 0.5rem 0.25rem 0; font-weight: 500;">
+              <%= tag.name %>
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @book.review.present? && current_user&.id == @book.user_id %>
+      <div style="margin-top: 1.5rem; padding: 1rem; background: #f9f9f9; border-left: 4px solid #3498db; border-radius: 4px;">
+        <strong>Moja recenzja:</strong>
+        <p style="margin-top: 0.5rem;"><%= simple_format(@book.review) %></p>
+      </div>
+    <% end %>
+
+    <div style="margin-top: 2rem;">
+      <% if current_user&.id == @book.user_id %>
+        <a href="<%= edit_book_path(@book) %>" class="btn btn-secondary">Edytuj</a>
+        <form action="<%= book_path(@book) %>" method="post" style="display: inline;">
+          <input type="hidden" name="_method" value="DELETE">
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+          <button type="submit" class="btn btn-danger" onclick="return confirm('Czy jesteś pewny?')">Usuń</button>
+        </form>
+      <% end %>
+      
+      <% if @book.read? && current_user&.id == @book.user_id %>
+        <a href="<%= new_book_post_path(@book) %>" class="btn btn-primary">Opublikuj opinię na forum</a>
+      <% end %>
+      
+      <a href="<%= books_path %>" class="btn btn-secondary">Powrót do Książek</a>
+    </div>
+  </div>
+</div>
