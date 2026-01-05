@@ -70,4 +70,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.6"
